@@ -1,0 +1,10 @@
+# git hints
+USERNAME=DEFINEME
+git config --global user.name "$USERNAME"
+git config --global color.diff auto
+git config --global color.status auto
+git config --global color.branch auto
+git config --global hooks.mailinglist cap4-devel@lists.sf.net
+git config --global user.email "$USERNAME@users.sourceforge.net"
+git clone ssh://$USERNAME@cap4.git.sourceforge.net/gitroot/cap4/cap4
+git clone ssh://$USERNAME@git.code.sf.net/p/cap4/code cap4-code

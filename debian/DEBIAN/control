@@ -1,0 +1,39 @@
+Package: cap-4.1
+Version: RELEASE
+Section: misc
+Priority: extra
+Architecture: all
+Depends: coreutils, util-linux, rsync
+Pre-Depends: perl
+Recommends: pdsh
+Suggests: pdsh
+Conflicts: 
+Replaces: 
+Installed-Size: 3300
+Maintainer: CAP DEVELOPERS <cap-devel_AT_sf_DOT_net>
+Description: The Cluster Administration Package (CAP) is meant to ease integration,
+ configuration, and systems management for clustering. It is the "glue"
+ that allows cluster administrators to leverage existing technologies
+ in a functional framework. This is done by delivering functionality
+ into three component categories.
+ .
+ The first is "Information Management." From this category functions
+ can be written to generate standard unix configuration files or to
+ produce a file arrangement suitable for other clustering technologies.
+ .
+ The next category is "Control." This category allows an administrator
+ to control their cluster as one system using common methods one uses to
+ control a single system, such as power and console. With the addition of
+ management devices, a cluster administrator can also control uids or
+ gather system sensor data when possible.
+ .
+ The last category is "Installation." When installing a multitude of
+ systems a cluster administrator wants a common method or set of methods
+ to ensure a set of functionality if delivered to each node in their
+ cluster. By leveraging existing technologies, CAP can ensure it can adapt
+ to fit the needs of other installation methods available. clusters.
+ .
+ Authors:
+ --------
+ CAPforge.org
+

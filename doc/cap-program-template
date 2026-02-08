@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+################################################################################
+# Name:		PROGRAMNAME
+# File:		PROGRAMNAME.EXTENSION
+# Purpose:	DESCRIPTION
+# Bug Reports:	cap4-devel_AT_lists_DOT_sf_DOT_net
+#
+# Last Modified:
+# $Id: cap-program-template 1349 2009-01-28 16:09:23Z jatencio $
+#
+# Copyright:
+# © Copyright 2012 Hewlett-Packard Development Company, L.P
+#
+# License: GPL v2
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+################################################################################
+
+# $$$$$$$$$$$$$$$$$$
+# begin main program
+# $$$$$$$$$$$$$$$$$$
+
+BEGIN {
+	die "Please define CAPHOME!\n" if !defined($ENV{CAPHOME});
+}
+
+use lib ( $ENV{CAPHOME} eq "/usr" ? "/usr/libexec/cap" : "$ENV{CAPHOME}/libexec");
+
+=head1 NAME
+
+PROGRAMNAME - Brief description of your program
+
+=head1 SYNOPSIS
+
+  $ How to use your program (with use statements, from the command line)
+
+=head1 DESCRIPTION
+
+More detailed description of your program.  Include CLI, Options, Variable Names, Exported Subroutines, Internal Subroutines.
+
+=head1 SEE ALSO
+
+Local documentation should be accessible in 
+  /usr/share/doc/cap4/ 
+
+Submit any questions/requests/gripes to the CAP-users mailing list:
+        cap4-users_AT_lists_DOT_sf_DOT_net
+
+Updated software and documentation may be found at the CAP web site:
+        http://www.capforge.org
+
+=head1 COPYRIGHT AND LICENSE
+
+© Copyright 2007 Hewlett-Packard Development Company, L.P
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+=cut
