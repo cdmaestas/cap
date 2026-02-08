@@ -1,0 +1,43 @@
+# change this if you want a different a diffent prefix base directory 
+PREFIXDIR=$(HOME)
+
+default: .make-$(SRC)
+
+download: $(TAR)
+
+$(TAR):
+	$(call print-header,"cap4 src download $@")
+	$(call download-curl-url,$(URL))
+
+rpm: .rpmbuild-$(SRC)
+
+.rpmbuild-$(SRC): $(TAR)
+	$(call print-header,"cap4 src rpmbuild $(SRC)")
+	$(call rpmbuild-src,$(TAR)) 
+	@[ -f .rpmbuild ] && mv .rpmbuild .rpmbuild-$(SRC)
+	@touch $@
+
+downloadstatus:
+	$(call print-header,"cap4 src $@ $(TAR)")
+	@[ -f $(TAR) ] && echo `ls --color $(TAR)`=`file $(TAR) | sed -e 's/$(TAR)://g'`
+	@sleep 1
+
+rpmstatus:
+	$(call print-header,"cap4 src $@ $(SRC)")
+	@[ -d RPMS ] && find ./RPMS -name \*.rpm | xargs ls --color
+	@sleep 1
+
+rpminstall: rpm
+	$(call print-header,"cap4 src $@ $(SRC)")
+	@echo "Run the following command as root in: "
+	@[ -d RPMS ] && find $(shell pwd)/RPMS -name \*.rpm | xargs echo yum install
+
+rpmupgrade: rpm
+	$(call print-header,"cap4 src $@ $(SRC)")
+	@echo "Run the following command as root in: "
+	@[ -d RPMS ] && find $(shell pwd)/RPMS -name *.rpm | xargs echo yum upgrade
+
+clean distclean:
+	$(call print-header,"cap4 src $@ $(SRC)")
+	rm -fr $(TAR) $(SRC) .rpmbuild-$(SRC) .rpmbuild BUILD BUILDROOT RPMS SOURCES SPECS SRPMS .make-$(SRC) .configure-$(SRC) src
+

@@ -1,0 +1,102 @@
+#!/bin/bash
+################################################################################
+# Name:		deploy
+# File:		deploy
+# Purpose:	call make in src to build/install as rpm or a directory
+# Bug Reports:	cap4-devel_AT_lists_DOT_sf_DOT_net
+#
+# Last Modified:
+# $Id: cap-program-template 1349 2009-01-28 16:09:23Z jatencio $
+#
+# Copyright:
+# © Copyright 2012 Hewlett-Packard Development Company, L.P
+#
+# License: GPL v2
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+################################################################################
+
+if [ -f /usr/libexec/cap4/sh/cfunc ]; then
+	. /usr/libexec/cap4/sh/cfunc
+else
+	# CAPHOME defined and if defined is there a cfunc library
+	[ "x${CAPHOME}" = "x" ] || 
+	 [ "x${CAPHOME}" != "x" -a ! -f ${CAPHOME}/libexec/sh/cfunc ] && 
+	 echo "Missing cfunc library" && exit 1
+
+	. ${CAPHOME}/libexec/sh/cfunc
+fi
+
+usage() {
+	cinfo "$0 --tool TOOLNAME --rpm --clean|--distclean"
+	cinfo "$0 --tool TOOLNAME --prefix PREFIXDIRECTORY  --clean|--distclean"
+	exit 1
+}
+
+parsecli "$@"
+
+check_validvar TOOL $TOOL
+
+if [ $RPM -eq 1 ]; then
+	[ $DEBUG -gt 0 ] && cprint MAKE "$TOOL => RPM"
+	make_tool $TOOL 
+else
+	check_validvar PREFIX $PREFIX
+	[ $DEBUG -gt 0 ] && cprint MAKE "$TOOL => $PREFIX"
+	make_tool $TOOL $PREFIX 
+fi
+
+# now look for src and call for tool to be built
+
+
+: <<=cut
+
+=pod
+
+=head1 deploy
+
+deploy - deploy cap src programs as rpms/debs or in a specific directory for use
+
+=head1 SYNOPSIS
+
+  $ deploy --tool TOOLNAME --rpm 
+  $ deploy --tool TOOLNAME --prefix PREFIXDIRECTORY 
+
+=head1 DESCRIPTION
+
+More detailed description of your program.  Include CLI, Options, Variable Names, Exported Subroutines, Internal Subroutines.
+
+=head1 SEE ALSO
+
+Local documentation should be accessible in 
+  /usr/share/doc/cap4/ 
+
+Submit any questions/requests/gripes to the CAP-users mailing list:
+        cap4-users_AT_lists_DOT_sf_DOT_net
+
+Updated software and documentation may be found at the CAP web site:
+        http://www.capforge.org
+
+=head1 COPYRIGHT AND LICENSE
+
+© Copyright 2012 Hewlett-Packard Development Company, L.P
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+=cut

@@ -1,0 +1,102 @@
+# functions taken from cbench make.def
+PREFIX        ?= /usr/local
+
+# downlad a url with wget
+define download-wget-url
+	@file=`basename $1`; url=`dirname $1`; \
+	for path in $$url http://cbench.sourceforge.net/common/tarballs https://synapse.sandia.gov/static/tarballs; do \
+	   [ -f $$file ] && break; \
+	   wget --connect-timeout=10 --tries=2 --no-check-certificate $$path/$$file; \
+	   [ -f $$file ] && touch $$file ; \
+	done;
+endef
+
+# downlad a url with curl
+# works great for redirected sites like sf $1 is the sf download url
+define download-curl-url
+	@file=`basename $1`; url=`dirname $1`; \
+	for path in $$url http://cbench.sourceforge.net/common/tarballs https://synapse.sandia.gov/static/tarballs; do \
+		[ -f $$file ] && break; \
+		echo "Downloading: $$path/$$file"; \
+		curl -k --connect-timeout 10 --retry 2 -L -O $$path/$$file; \
+		[ -f $$file ] && touch $$file ; \
+	done;
+endef
+
+define gitpull-src
+	@echo "git cloning: $1 $2"
+	git clone $1 $2
+endef
+
+define svncheckout-src
+	@echo "svn checkout: $1 $2"
+	svn co -q $1 $2
+endef
+
+# common routing to unpack tgz/bzip
+define untar-src
+	@echo "Extracting: $1"
+	@if [ -f $1 ]; then \
+		file $1 | grep -q bzip; \
+		if [ $$? -eq 0 ]; then \
+			tar xjf $1; \
+		else \
+			tar xzf $1; \
+		fi; \
+	else \
+		echo "$1 not found, download manually or set http_proxy env variable?"; exit 1; \
+	fi;
+	touch $@
+endef
+
+define is-available-as-distro-package
+	@echo "Searching for package: $2 using $1"
+	@if [ $1 = "yum" -o $1 = "rpm" ]; then \
+		yum search $2 | grep ^$2; \
+		echo $? ; \
+	elif [ $1 = "apt-cache" -o $1 = "apt" -o $1 = "deb" ]; then \
+		apt-cache search $2 | grep ^$2; \
+		echo $? ; \
+	fi;
+endef
+
+# print a header
+define print-header
+	@echo "========================================================="; \
+	echo "----- $1"; \
+	echo "========================================================="; 
+endef
+
+define rpmbuild-src
+	@echo "Building: $1"
+	@if [ -f $1 ]; then \
+		file $1 | grep -q RPM; \
+		if [ $$? -eq 0 ]; then \
+			rpmbuild --define "%_topdir $(CURDIR)" --rebuild $1 > .rpmbuild 2>&1; \
+		else \
+			rpmbuild --define "%_topdir $(CURDIR)" -tb $1 > .rpmbuild 2>&1; \
+		fi; \
+	else \
+		echo "$1 not found, download manually or set http_proxy env variable?"; exit 1; \
+	fi;
+endef
+
+define link-src
+	@$(call print-header,"cap4 linking src to $1")
+	@ln -sf $1 src  
+endef
+
+define configure-src 
+	@$(call print-header,"cap4 $1 configure options $2")
+	cd src && ./configure $2 > ../.configure-$1 2>&1
+endef
+
+define make-src 
+	$(call print-header,"cap4 src make $1")
+	make -C src > .make-$1 2>&1
+endef
+
+define make-src-install
+	$(call print-header,"cap4 src make $1 install")
+	make -C src install >> .make-$1 2>&1
+endef
