@@ -1,21 +1,14 @@
-#
-# developer Makefile for cap4
-#
+CC = gcc
+CFLAGS = -O2
+LDFLAGS = -lm
 
-prefix        ?= /opt/cap4
+all: comprestimator
 
-install:
-	@echo "Installing cap4 in $(prefix)"
-	@export CAP4DEVHOME=`pwd`; ./install.sh $(prefix) .
+comprestimator: comprestimator.o libz.a
+	$(CC) $(CFLAGS) -no-pie -o $@ comprestimator.o libz.a $(LDFLAGS)
 
-dist: tgz
-svndist: svntgz
+comprestimator.o: comprestimator.c
+	$(CC) $(CFLAGS) -c comprestimator.c
 
-tgz rpm srpm deb: build-cap4.sh
-	@echo "Building official cap4 $@"
-	@export CAP4DEVHOME=`pwd`; ./build-cap4.sh official $@
-
-gittgz svntgz gitrpm svnrpm gitsrpm svnsrpm gitdeb svndeb: build-cap4.sh
-	@echo "Building snapshot cap4 $@"
-	export CAP4DEVHOME=`pwd` && ./build-cap4.sh snapshot $(shell echo $@ | sed -e 's/svn//g' -e 's/git//g')
-
+clean:
+	rm -f comprestimator comprestimator.o
