@@ -119,24 +119,19 @@ EOF
     fi
 elif [[ "${PKG}" == "deb" ]]; then
     maketgz debian
-    if [[ -d /tmp/cap5-debian ]]; then
-        rm -fr /tmp/cap5-debian
-    fi
-    mkdir -p /tmp/cap5-debian
+    DEB_STAGING=$(mktemp -d)
+    trap 'rm -rf "${DEB_STAGING}"' EXIT
     cd "${CAP5DEVHOME}"
-    "${CAP5DEVHOME}/install.sh" /tmp/cap5-debian
+    "${CAP5DEVHOME}/install.sh" "${DEB_STAGING}"
     cd "${SOURCE_BASE_DIR}/cap-${VERSION}"
-    cp -r debian/DEBIAN /tmp/cap5-debian
-    sed "${REL_SEDCMD}" "${CAP5DEVHOME}/debian/DEBIAN/control" > /tmp/cap5-debian/DEBIAN/control
-    cd /tmp
+    cp -r debian/DEBIAN "${DEB_STAGING}"
+    sed "${REL_SEDCMD}" "${CAP5DEVHOME}/debian/DEBIAN/control" > "${DEB_STAGING}/DEBIAN/control"
     if [[ -z "${RELEASE:-}" ]]; then
         DIST_DEB="cap-${VERSION}-1.deb"
     else
         DIST_DEB="cap-${VERSION}-1_${RELEASE}.deb"
     fi
-    dpkg -b /tmp/cap5-debian "${DIST_DEB}"
-    rm -fr /tmp/cap5-debian
-    mv -f "/tmp/${DIST_DEB}" "${CAP5DEVHOME}"
+    dpkg -b "${DEB_STAGING}" "${CAP5DEVHOME}/${DIST_DEB}"
     echo "${PKGTYPE} cap5 ${PKG} located in ${CAP5DEVHOME}/${DIST_DEB}"
 elif [[ "${PKG}" == "tgz" ]]; then
     maketgz
