@@ -62,7 +62,7 @@ make test
 
 Build a release tarball:
 ```sh
-export CAP4DEVHOME=$(pwd)
+export CAP5DEVHOME=$(pwd)
 ./build-cap5.sh official tgz
 ```
 
