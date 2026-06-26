@@ -1,14 +1,10 @@
-Package: cap-4.1
-Version: RELEASE
-Section: misc
-Priority: extra
+Package: cap
+Version: 4.1-RELEASE
+Section: admin
+Priority: optional
 Architecture: all
-Depends: coreutils, util-linux, rsync
-Pre-Depends: perl
-Recommends: pdsh
-Suggests: pdsh
-Conflicts: 
-Replaces: 
+Depends: bash (>= 4.0), coreutils, util-linux, rsync
+Recommends: pdsh, shellcheck
 Installed-Size: 3300
 Maintainer: CAP DEVELOPERS <cap-devel_AT_sf_DOT_net>
 Description: The Cluster Administration Package (CAP) is meant to ease integration,
@@ -31,9 +27,8 @@ Description: The Cluster Administration Package (CAP) is meant to ease integrati
  systems a cluster administrator wants a common method or set of methods
  to ensure a set of functionality if delivered to each node in their
  cluster. By leveraging existing technologies, CAP can ensure it can adapt
- to fit the needs of other installation methods available. clusters.
+ to fit the needs of other installation methods available.
  .
  Authors:
  --------
  CAPforge.org
-

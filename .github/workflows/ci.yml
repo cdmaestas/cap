@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+      - name: Run shellcheck
+        run: |
+          find . -not -path './.git/*' -not -path './src/*' \
+            \( -name '*.sh' -o -name 'cfunc' -o -name 'deploy' \) \
+            -print0 | xargs -0 shellcheck --rcfile .shellcheckrc
+
+  macos-compat:
+    name: macOS shell compatibility
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: brew install shellcheck
+      - name: Run shellcheck
+        run: |
+          find . -not -path './.git/*' -not -path './src/*' \
+            \( -name '*.sh' -o -name 'cfunc' -o -name 'deploy' \) \
+            -print0 | xargs -0 shellcheck --rcfile .shellcheckrc
+
+  build-tarball:
+    name: Build tarball
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: shellcheck
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build release tarball
+        env:
+          CAP5DEVHOME: ${{ github.workspace }}
+        run: ./build-cap5.sh official tgz
+      - name: Upload tarball artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cap-tarball
+          path: '*.tar.gz'
