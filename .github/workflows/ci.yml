@@ -19,7 +19,7 @@ jobs:
         run: |
           find . -not -path './.git/*' -not -path './src/*' \
             \( -name '*.sh' -o -name 'cfunc' -o -name 'deploy' \) \
-            -print0 | xargs -0 shellcheck --rcfile .shellcheckrc
+            -print0 | xargs -0 shellcheck
 
   macos-compat:
     name: macOS shell compatibility
@@ -32,7 +32,7 @@ jobs:
         run: |
           find . -not -path './.git/*' -not -path './src/*' \
             \( -name '*.sh' -o -name 'cfunc' -o -name 'deploy' \) \
-            -print0 | xargs -0 shellcheck --rcfile .shellcheckrc
+            -print0 | xargs -0 shellcheck
 
   build-tarball:
     name: Build tarball

@@ -28,10 +28,10 @@
 
 # if cap is installed in system level directories, it should be in our path already,
 CAPHOME=INSERT_CAPHOME_HERE
-if [ $CAPHOME != "SYSTEM" ]; then
-	export CAPHOME
-	export PATH=$CAPHOME/bin:$PATH
-	export MANPATH=$CAPHOME/man:$MANPATH
+if [[ "${CAPHOME}" != "SYSTEM" ]]; then
+    export CAPHOME
+    export PATH="${CAPHOME}/bin:${PATH}"
+    export MANPATH="${CAPHOME}/man:${MANPATH}"
 fi
 
 
