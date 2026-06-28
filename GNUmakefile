@@ -18,7 +18,7 @@ help:
 	@echo "  dist     Build distribution tarball"
 
 lint:
-	shellcheck --rcfile .shellcheckrc $(SHELL_SCRIPTS)
+	shellcheck $(SHELL_SCRIPTS)
 
 test:
 	bats tests/

@@ -27,6 +27,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ############################################################################ 
 
+# shellcheck disable=SC2034
 BUILD_ROOT=$1
 exit
 
