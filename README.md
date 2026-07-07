@@ -60,21 +60,37 @@ make test
 
 ## Packaging
 
-Build a release tarball:
+Build packages locally:
 ```sh
 export CAP5DEVHOME=$(pwd)
-./build-cap5.sh official tgz
+./build-cap5.sh official tgz   # tarball
+./build-cap5.sh official rpm   # RPM
+./build-cap5.sh official deb   # Debian package
+./build-cap5.sh snapshot rpm   # snapshot RPM from current git state
 ```
 
-Build a snapshot RPM from the current git state:
+## Releases
+
+Pushing a `v*.*.*` tag triggers the release workflow, which:
+1. Patches the version into `cap.spec` and `debian/DEBIAN/control` from the tag
+2. Builds RPM and DEB packages
+3. Signs the RPM with the project GPG key (stored as `secrets.GPG_PRIVATE_KEY`)
+4. Verifies the signature against `packaging/RPM-GPG-KEY-cap5`
+5. Publishes a GitHub Release with the signed packages and public key
+
+**To create a release:**
 ```sh
-./build-cap5.sh snapshot rpm
+git tag v5.0.0
+git push origin v5.0.0
 ```
 
-Build a Debian package:
+**To verify a downloaded RPM:**
 ```sh
-./build-cap5.sh official deb
+rpm --import packaging/RPM-GPG-KEY-cap5
+rpm --checksig cap-5.0.0-1.noarch.rpm
 ```
+
+**First-time setup:** add the GPG private key as a repository secret named `GPG_PRIVATE_KEY` in GitHub → Settings → Secrets and variables → Actions (same key used in Scale-GUInstall).
 
 ## Directory Layout
 
@@ -87,6 +103,7 @@ cap/
 ├── GNUmakefile          # Developer targets: lint, test
 ├── cap.spec             # RPM spec
 ├── debian/DEBIAN/       # Debian packaging metadata
+├── packaging/           # GPG public key for package verification
 ├── etc/profile.d/       # Shell profile scripts (cap.sh, cap.csh)
 ├── libexec/sh/cfunc     # Bash function library sourced by deploy
 ├── src/                 # Per-tool Makefiles (pdsh, genders, slurm, …)
