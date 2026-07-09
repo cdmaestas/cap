@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install build tools
-        run: sudo apt-get install -y rpm rpmsign dpkg-dev shellcheck
+        run: sudo apt-get install -y rpm dpkg-dev shellcheck
 
       - name: Set version from tag
         run: |
