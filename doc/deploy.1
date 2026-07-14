@@ -1,0 +1,111 @@
+.TH DEPLOY 1 "2026" "CAP5" "CAP5 Cluster Administration Package"
+.SH NAME
+deploy \- build and install a CAP5 cluster tool as RPM or into a directory
+.SH SYNOPSIS
+.B deploy
+.B \-\-tool
+.I TOOLNAME
+.RB [ \-\-rpm ]
+.RB [ \-\-clean | \-\-distclean ]
+.PP
+.B deploy
+.B \-\-tool
+.I TOOLNAME
+.B \-\-prefix
+.I DIR
+.RB [ \-\-clean | \-\-distclean ]
+.SH DESCRIPTION
+.B deploy
+invokes the per-tool Makefile under
+.IR src/TOOLNAME /
+to build and install a single tool from the CAP5 bundle.
+It sources the shared function library from
+.I /usr/libexec/cap5/sh/cfunc
+(system install) or
+.I $CAPHOME/libexec/sh/cfunc
+(development checkout).
+.SH OPTIONS
+.TP
+.BI \-\-tool " TOOLNAME"
+Name of the tool directory under
+.IR src/ .
+Required.
+.TP
+.BI \-\-prefix " DIR"
+Install the tool into
+.IR DIR .
+Passed to
+.B make install
+as the
+.B PREFIX
+variable.
+Mutually exclusive with
+.BR \-\-rpm .
+.TP
+.B \-\-rpm
+Build and install as an RPM package via
+.B rpmbuild
+and
+.BR rpminstall .
+.TP
+.B \-\-clean
+Run
+.B make clean
+before building.
+.TP
+.B \-\-distclean
+Run
+.B make distclean
+before building.
+.TP
+.BR \-\-debug , " \-\-verbose"
+Print additional diagnostic information during the build.
+.TP
+.BR \-\-help , " \-\-usage"
+Print a brief usage summary and exit.
+.SH ENVIRONMENT
+.TP
+.B CAPHOME
+Path to the CAP5 development checkout.
+Required when
+.I /usr/libexec/cap5/sh/cfunc
+is not present (i.e., running from source).
+.SH EXAMPLES
+Build and install
+.B pdsh
+as an RPM:
+.PP
+.RS
+deploy \-\-tool pdsh \-\-rpm
+.RE
+.PP
+Install
+.B genders
+into a local prefix, discarding any prior build state:
+.PP
+.RS
+deploy \-\-tool genders \-\-prefix /opt/cap5 \-\-distclean
+.RE
+.SH FILES
+.TP
+.I /usr/libexec/cap5/sh/cfunc
+Shared bash function library (system install).
+.TP
+.I $CAPHOME/libexec/sh/cfunc
+Shared bash function library (development checkout).
+.TP
+.I /usr/share/doc/cap5/
+Installed documentation.
+.SH SEE ALSO
+.BR make (1),
+.BR rpmbuild (8)
+.SH BUGS
+Report bugs to:
+.I cap5-devel_AT_lists_DOT_sf_DOT_net
+.SH COPYRIGHT
+\(co Copyright 2006, 2007, 2012 Hewlett-Packard Development Company, L.P.
+.PP
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.

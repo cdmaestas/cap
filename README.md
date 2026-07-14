@@ -48,6 +48,11 @@ Available flags:
 
 ## Development
 
+Install the git pre-commit hook (runs shellcheck on staged shell files):
+```sh
+make install-hooks
+```
+
 Run shellcheck on all scripts:
 ```sh
 make lint
@@ -56,6 +61,11 @@ make lint
 Run the bats test suite:
 ```sh
 make test
+```
+
+A manpage for `deploy` is installed to `/usr/share/man/man1/deploy.1.gz`:
+```sh
+man deploy
 ```
 
 ## Packaging
@@ -100,14 +110,15 @@ cap/
 ├── install.sh           # Copies files into a build root
 ├── build-cap5.sh        # Produces rpm/deb/tgz distribution archives
 ├── Makefile             # install / dist / tgz / rpm targets
-├── GNUmakefile          # Developer targets: lint, test
+├── GNUmakefile          # Developer targets: lint, test, install-hooks
 ├── cap.spec             # RPM spec
 ├── debian/DEBIAN/       # Debian packaging metadata
 ├── packaging/           # GPG public key for package verification
+├── hooks/               # Git hook scripts (install with make install-hooks)
 ├── etc/profile.d/       # Shell profile scripts (cap.sh, cap.csh)
 ├── libexec/sh/cfunc     # Bash function library sourced by deploy
 ├── src/                 # Per-tool Makefiles (pdsh, genders, slurm, …)
-├── doc/                 # Documentation and license files
+├── doc/                 # Documentation, license, and deploy.1 manpage
 └── tests/               # bats test suite
 ```
 
