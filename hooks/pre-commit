@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v shellcheck &>/dev/null; then
+    echo "pre-commit: shellcheck not found, skipping lint" >&2
+    exit 0
+fi
+
+SCRIPTS=$(git diff --cached --name-only --diff-filter=ACM | \
+    grep -E '(\.sh$|/cfunc$|/deploy$)' || true)
+
+if [[ -z "${SCRIPTS}" ]]; then
+    exit 0
+fi
+
+echo "pre-commit: running shellcheck on staged files..."
+# shellcheck disable=SC2086
+shellcheck ${SCRIPTS} && echo "pre-commit: shellcheck passed"
