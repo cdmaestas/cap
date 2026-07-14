@@ -70,6 +70,7 @@ Authors:
 %{_cap_home}/bin/*
 %{_cap_home}/libexec/*
 /usr/share/doc/cap5
+/usr/share/man/man1/deploy.1.gz
 /usr/libexec/cap5
 /usr/src/cap5
 /usr/bin/deploy
