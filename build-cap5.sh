@@ -29,7 +29,8 @@ VERSION=$(grep "^Version:" "${CAP5DEVHOME}/cap.spec" | awk '{print $2}')
 # BEGIN: get source versions from repo
 #
 git_version() {
-    GITVERSION=$(git describe --always)
+    GITVERSION=$(git describe --always) || { echo "git describe failed" >&2; exit 1; }
+    [[ -n "${GITVERSION}" ]] || { echo "git describe returned empty string" >&2; exit 1; }
     GITMODIFIED=$(git status | grep -qE 'modified:|added:|deleted:' && echo "_M" || true)
     RELEASE="${GITVERSION}${GITMODIFIED}"
 }
@@ -62,7 +63,7 @@ fi
 maketgz() {
     local distro="${1:-}"
     local sedcmd
-    sedcmd="s/$(echo "${CAP5DEVHOME}" | sed 's/\//\\\//g')//g"
+    sedcmd="s|${CAP5DEVHOME}||g"
     local exclude=''
     if [[ -d .svn ]]; then
         exclude=$(for file in $(svn stat "${CAP5DEVHOME}" | sed "${sedcmd}" | grep "?" | awk '{print $2}'); do
@@ -102,6 +103,7 @@ maketgz() {
 
 if [[ "${PKG}" == "rpm" || "${PKG}" == "srpm" ]]; then
     maketgz
+    [[ -n "${SOURCE_BASE_DIR:-}" && -n "${DIST_TGZ:-}" ]] || { echo "maketgz failed to set SOURCE_BASE_DIR/DIST_TGZ" >&2; exit 1; }
     uid=$(id -u)
     if [[ "${uid}" -ne 0 ]]; then
         if [[ ! -f "${HOME}/.rpmmacros" ]]; then
@@ -119,6 +121,7 @@ EOF
     fi
 elif [[ "${PKG}" == "deb" ]]; then
     maketgz debian
+    [[ -n "${SOURCE_BASE_DIR:-}" ]] || { echo "maketgz failed to set SOURCE_BASE_DIR" >&2; exit 1; }
     DEB_STAGING=$(mktemp -d)
     trap 'rm -rf "${DEB_STAGING}"' EXIT
     cd "${CAP5DEVHOME}"
@@ -135,6 +138,7 @@ elif [[ "${PKG}" == "deb" ]]; then
     echo "${PKGTYPE} cap5 ${PKG} located in ${CAP5DEVHOME}/${DIST_DEB}"
 elif [[ "${PKG}" == "tgz" ]]; then
     maketgz
+    [[ -n "${SOURCE_BASE_DIR:-}" && -n "${DIST_TGZ:-}" ]] || { echo "maketgz failed to set SOURCE_BASE_DIR/DIST_TGZ" >&2; exit 1; }
     cp -f "${SOURCE_BASE_DIR}/${DIST_TGZ}" "${CAP5DEVHOME}"
     echo "${PKGTYPE} cap5 ${PKG} located in ${CAP5DEVHOME}/${DIST_TGZ}"
 else

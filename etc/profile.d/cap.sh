@@ -2,7 +2,7 @@
 # Name:		cap.sh
 # File:		cap.sh
 # Purpose:	profile script for cap (sh, ksh and bash style)
-# Bug Reports:	cap4-devel_AT_lists_DOT_sf_DOT_net
+# Bug Reports:	cap5-devel_AT_lists_DOT_sf_DOT_net
 #
 # Last Modified:
 # $Id: cap.sh 1054 2007-09-05 13:48:25Z cashmont $

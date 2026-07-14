@@ -52,8 +52,10 @@ jobs:
           find . -maxdepth 1 -name "*.deb" -exec mv {} dist/ \;
 
       - name: Import GPG signing key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          printf '%s' "${GPG_PRIVATE_KEY}" | gpg --batch --import
           KEY_ID=$(gpg --list-secret-keys --keyid-format LONG 2>/dev/null \
             | grep "^sec" | head -1 | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$KEY_ID" >> "$GITHUB_ENV"
