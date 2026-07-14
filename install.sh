@@ -36,6 +36,10 @@ cp -a libexec/. "${BUILD_ROOT}/${_cap_home}/libexec/"
 mkdir -p "${BUILD_ROOT}/${_cap_home}/share/doc"
 cp -a doc/. "${BUILD_ROOT}/${_cap_home}/share/doc/"
 
+# man pages
+mkdir -p "${BUILD_ROOT}/usr/share/man/man1"
+gzip -c doc/deploy.1 > "${BUILD_ROOT}/usr/share/man/man1/deploy.1.gz"
+
 # etc
 mkdir -p "${BUILD_ROOT}/${_cap_home}/etc"
 cp -a etc/. "${BUILD_ROOT}/${_cap_home}/etc/"

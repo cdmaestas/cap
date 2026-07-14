@@ -34,11 +34,11 @@ parsecli "$@"
 check_validvar TOOL "${TOOL}"
 
 if [[ "${RPM}" -eq 1 ]]; then
-    [[ "${DEBUG}" -gt 0 ]] && cprint MAKE "${TOOL} => RPM"
+    [[ "${DEBUG}" -gt 0 ]] && cdebug "make_tool ${TOOL} => RPM"
     make_tool "${TOOL}"
 else
     check_validvar PREFIX "${PREFIX}"
-    [[ "${DEBUG}" -gt 0 ]] && cprint MAKE "${TOOL} => ${PREFIX}"
+    [[ "${DEBUG}" -gt 0 ]] && cdebug "make_tool ${TOOL} => ${PREFIX}"
     make_tool "${TOOL}" "${PREFIX}"
 fi
 
