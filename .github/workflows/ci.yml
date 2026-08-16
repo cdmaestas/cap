@@ -33,3 +33,20 @@ jobs:
             \( -name '*.sh' -o -name 'cfunc' -o -name 'deploy' \) \
             -print0 | xargs -0 shellcheck
 
+  bats:
+    name: bats test suite
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bats (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y bats
+      - name: Install bats (macOS)
+        if: runner.os == 'macOS'
+        run: brew install bats-core
+      - name: Run bats
+        run: bats tests/
+

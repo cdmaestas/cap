@@ -54,6 +54,7 @@ jobs:
       - name: Import GPG signing key
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           printf '%s' "${GPG_PRIVATE_KEY}" | gpg --batch --import
           KEY_ID=$(gpg --list-secret-keys --keyid-format LONG 2>/dev/null \
@@ -62,8 +63,12 @@ jobs:
           mkdir -p ~/.gnupg
           echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
           gpgconf --kill gpg-agent
-          printf '%%_gpg_name %s\n%%__gpg /usr/bin/gpg\n%%__gpg_sign_cmd %%{__gpg} gpg --batch --no-verbose --no-armor --no-secmem-warning -u "%%{_gpg_name}" -sbo %%{__signature_filename} --digest-algo sha256 %%{__plaintext_filename}\n' \
-            "$KEY_ID" > ~/.rpmmacros
+          PASSPHRASE_FILE="${RUNNER_TEMP}/gpg-passphrase"
+          install -m 600 /dev/null "${PASSPHRASE_FILE}"
+          printf '%s' "${GPG_PASSPHRASE}" > "${PASSPHRASE_FILE}"
+          echo "GPG_PASSPHRASE_FILE=${PASSPHRASE_FILE}" >> "$GITHUB_ENV"
+          printf '%%_gpg_name %s\n%%__gpg /usr/bin/gpg\n%%__gpg_sign_cmd %%{__gpg} gpg --batch --no-verbose --no-armor --no-secmem-warning --pinentry-mode loopback --passphrase-file "%s" -u "%%{_gpg_name}" -sbo %%{__signature_filename} --digest-algo sha256 %%{__plaintext_filename}\n' \
+            "$KEY_ID" "${PASSPHRASE_FILE}" > ~/.rpmmacros
 
       - name: Sign RPM
         run: |
@@ -71,6 +76,10 @@ jobs:
             rpmsign --addsign "$rpm"
             echo "Signed: $rpm"
           done
+
+      - name: Clean up GPG passphrase file
+        if: always()
+        run: rm -f "${GPG_PASSPHRASE_FILE:-}"
 
       - name: Verify RPM signature
         run: |

@@ -6,7 +6,7 @@ define download-wget-url
 	@file=`basename $1`; url=`dirname $1`; \
 	for path in $$url http://cbench.sourceforge.net/common/tarballs https://synapse.sandia.gov/static/tarballs; do \
 	   [ -f $$file ] && break; \
-	   wget --connect-timeout=10 --tries=2 --no-check-certificate $$path/$$file; \
+	   wget --connect-timeout=10 --tries=2 $$path/$$file; \
 	   [ -f $$file ] && touch $$file ; \
 	done;
 endef
@@ -18,7 +18,7 @@ define download-curl-url
 	for path in $$url http://cbench.sourceforge.net/common/tarballs https://synapse.sandia.gov/static/tarballs; do \
 		[ -f $$file ] && break; \
 		echo "Downloading: $$path/$$file"; \
-		curl -k --connect-timeout 10 --retry 2 -L -O $$path/$$file; \
+		curl --connect-timeout 10 --retry 2 -L -O $$path/$$file; \
 		[ -f $$file ] && touch $$file ; \
 	done;
 endef
