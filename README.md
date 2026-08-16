@@ -1,6 +1,18 @@
 # CAP5 — Cluster Administration Package
 
-CAP5 is a framework that integrates, configures, and manages HPC clusters by bundling and deploying common cluster tools (pdsh, genders, slurm, munge, conman, freeipmi, powerman, and more) through a unified build and install system.
+CAP5 is a build/install framework — `deploy`, `cfunc`, and the packaging
+pipeline — originally built to bundle and deploy common HPC cluster tools
+(pdsh, genders, slurm, munge, conman, freeipmi, powerman, and more) through
+a single interface.
+
+**Project status: preserved, not revived.** The framework itself
+(`deploy`, `libexec/sh/cfunc`, packaging, CI) is maintained and works today.
+The tool recipes under [`src/`](src/README.md) are a historical snapshot
+from 2012 — most of their download URLs point at hosts that no longer
+exist (Google Code, legacy GitHub Downloads, dead SourceForge projects).
+Running `deploy --tool <name>` today will not fetch a working tarball for
+most tools unless you supply the source yourself. See
+[`src/README.md`](src/README.md) for details.
 
 ## Prerequisites
 

@@ -22,6 +22,18 @@ REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/.." && pwd)"
     [[ -d "${tmpdir}/opt/cap5/libexec" ]]
     [[ -d "${tmpdir}/opt/cap5/share/doc" ]]
     [[ -d "${tmpdir}/opt/cap5/etc" ]]
+    [[ -f "${tmpdir}/opt/cap5/share/doc/README.md" ]]
+    [[ -f "${tmpdir}/opt/cap5/share/doc/CHANGELOG.md" ]]
+    rm -rf "${tmpdir}"
+}
+
+@test "install.sh installs deploy.1 and cfunc.3 manpages" {
+    local tmpdir
+    tmpdir=$(mktemp -d)
+    run bash "${REPO_ROOT}/install.sh" "${tmpdir}" /opt/cap5
+    [[ "${status}" -eq 0 ]]
+    [[ -f "${tmpdir}/usr/share/man/man1/deploy.1.gz" ]]
+    [[ -f "${tmpdir}/usr/share/man/man3/cfunc.3.gz" ]]
     rm -rf "${tmpdir}"
 }
 

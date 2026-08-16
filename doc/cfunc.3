@@ -1,0 +1,142 @@
+.TH CFUNC 3 "July 13, 2026" "CAP5" "CAP5 Cluster Administration Package"
+.SH NAME
+cfunc \- shared bash function library for CAP5 tooling
+.SH SYNOPSIS
+.B source /usr/libexec/cap5/sh/cfunc
+.br
+.B source $CAPHOME/libexec/sh/cfunc
+.SH DESCRIPTION
+.B cfunc
+is a bash function library sourced by
+.BR deploy (1)
+and available to any CAP5 tool script. It provides colored console
+output, portable long-option CLI parsing, variable validation, package
+search helpers, and the tool build/install driver used by
+.BR deploy (1).
+.PP
+The library sets
+.B "set -euo pipefail"
+when sourced and initializes the global variables
+.BR TOOL ", " PREFIX ", " RPM ", " CLEAN ", " DISTCLEAN ", and " DEBUG
+to empty/zero defaults.
+.SH FUNCTIONS
+.TP
+.BI cinfo\ "MESSAGE..."
+Print
+.I MESSAGE
+to stdout in bold blue. Informational output.
+.TP
+.BI cdebug\ "MESSAGE..."
+Print
+.I MESSAGE
+to stdout in bold cyan. Debug output.
+.TP
+.BI cpass\ "MESSAGE..."
+Print
+.I MESSAGE
+to stdout in bold green. Success output.
+.TP
+.BI cwarn\ "MESSAGE..."
+Print
+.I MESSAGE
+to stdout in bold yellow. Warning output.
+.TP
+.BI cerror\ "MESSAGE..."
+Print
+.I MESSAGE
+to
+.B stderr
+in bold red. Error output.
+.PP
+All five are wrappers around
+.BR cprint (tag, " message..." ),
+which only emits color codes when stdout is a terminal (via
+.BR tput (1));
+output is plain text when redirected or piped.
+.TP
+.BI parsecli\ "ARGS..."
+Parse long-option CLI arguments and set the globals
+.BR TOOL ", " PREFIX ", " RPM ", " CLEAN ", " DISTCLEAN ", and " DEBUG .
+Resets all globals to defaults on every call, so results never leak
+between invocations. Recognizes
+.BR \-\-tool ,
+.BR \-\-prefix ,
+.BR \-\-rpm ,
+.BR \-\-clean ,
+.BR \-\-distclean ,
+.BR \-\-debug " / " \-\-verbose ,
+and
+.BR \-\-help " / " \-\-usage
+(the latter calls the caller-defined
+.B usage
+function and exits). Unrecognized flags print an error via
+.B cerror
+and call
+.BR usage .
+.TP
+.BI check_validvar\ "NAME VALUE"
+Returns 1 and prints an error via
+.B cerror
+if
+.I VALUE
+is empty or fewer than 2 arguments were given. Used to assert required
+variables are set before proceeding.
+.TP
+.BI pkg_search\ "METHOD PACKAGE"
+Search for
+.I PACKAGE
+using
+.IR METHOD ,
+one of
+.BR yum ", " rpm ", " apt-cache ", " apt ", or " deb .
+Returns 1 for an unrecognized method or fewer than 2 arguments.
+.TP
+.BI make_tool\ "TOOL [PREFIX]"
+Locate the Makefile for
+.I TOOL
+under
+.I /usr/src/cap5/TOOL
+(system install) or
+.IR $CAPHOME/src/TOOL
+(development checkout), then build and install it according to the
+.BR RPM ", " CLEAN ", and " DISTCLEAN
+globals set by
+.BR parsecli .
+Exits 1 if neither location has a Makefile for
+.IR TOOL ,
+or if both
+.B RPM
+and a non-empty
+.B PREFIX
+are set simultaneously (unsupported combination).
+This is the function
+.BR deploy (1)
+calls after parsing its CLI arguments.
+.SH ENVIRONMENT
+.TP
+.B CAPHOME
+Path to the CAP5 development checkout. Consulted by
+.B make_tool
+when
+.I /usr/src/cap5/TOOL
+does not exist.
+.SH FILES
+.TP
+.I /usr/libexec/cap5/sh/cfunc
+System install location.
+.TP
+.I $CAPHOME/libexec/sh/cfunc
+Development checkout location.
+.SH SEE ALSO
+.BR deploy (1),
+.BR bash (1)
+.SH BUGS
+Report bugs to:
+.I https://github.com/cdmaestas/cap/issues
+.SH COPYRIGHT
+\(co Copyright 2012 Hewlett-Packard Development Company, L.P.
+.PP
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.

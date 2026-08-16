@@ -1,0 +1,5 @@
+# GPG key material — never commit private keys, revocation certs, or passphrases
+*.asc
+*-revocation.asc
+*-private-key.asc
+gpg-passphrase*
