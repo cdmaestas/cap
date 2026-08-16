@@ -3,7 +3,7 @@ include ../make.def
 VERSION=2.29
 SRC=pdsh-$(VERSION)
 TAR=$(SRC).tar.bz2
-URL="http://pdsh.googlecode.com/files/$(TAR)"
+URL="https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/pdsh/$(TAR)"
 
 include ../make.workbench
 

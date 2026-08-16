@@ -1,39 +1,61 @@
-# src/ — tool recipes (historical)
+# src/ — tool recipes
 
 Each subdirectory here is a Makefile-based recipe for building one HPC
 cluster tool (pdsh, genders, slurm, munge, conman, freeipmi, powerman,
 and others), driven through `deploy` and the shared macros in
 [`make.def`](make.def).
 
-**Status: preserved as-is, not maintained as working downloads.**
+**Status: build logic preserved and maintained; download URLs are a mix
+of working and historical — see below for which is which.**
 
-These recipes date to CAP4 (2012). Most of the `URL=` lines point at
-hosts that no longer serve the referenced tarball:
+These recipes date to CAP4 (2012). Every `URL=` line has been checked
+against the live host (2026-08-16), not assumed.
 
-- `*.googlecode.com` — Google Code shut down in 2016.
-- `github.com/downloads/...` — GitHub removed the legacy Downloads
-  feature in 2013.
-- `*.svn.sourceforge.net` — SourceForge's SVN hosting for this project
-  is gone; the `cap` and `capforge` namespaces on SourceForge now
-  belong to unrelated projects.
+## Working — updated to a verified current source
 
-A handful still resolve (`ftp.gnu.org`, `schedmd.com`, GitHub release
-tarballs) because the upstream project is still active, but none of
-these URLs have been re-verified against original checksums.
+Twelve recipes pointed at hosts that are fully gone. Where a real
+replacement exists, the `URL=` line was updated and the exact expected
+file was confirmed to download successfully:
 
-## If you want to actually build one of these tools
+- `conman`, `diskscrub`, `io-watchdog`, `munge`, `nfsroot`, `nodediag`,
+  `padb`, `pdsh`, `powerman`, `slurm-spank-plugins`, `sqlog` —
+  `*.googlecode.com` is dead, but Google preserved the original release
+  files at `storage.googleapis.com/google-code-archive-downloads/`.
+  Each project's exact expected filename was confirmed present there.
+- `clustershell` — the old `github.com/downloads/...` URL (GitHub
+  killed that feature in 2013) is replaced with a real GitHub tag
+  archive. Note: the repo itself moved from `cea-hpc/clustershell` to
+  `clustershell/clustershell`, and GitHub's archive basename is
+  `v$(VERSION).tar.gz`, not `$(SRC).tar.gz` — see the comment in
+  `clustershell/Makefile` before "fixing" this to match the other
+  recipes' pattern.
 
-Don't rely on the recipe's `URL=` line. Instead:
+## Still historical — dead or unverified, left untouched
 
-1. Find the tool's current upstream (its own project page, not the
-   URL recorded here) and download the source yourself.
+- `environment-modules` — points at `pkgs.repoforge.org`; RepoForge is
+  fully gone and the bare domain now resolves to an unrelated GitHub
+  Pages site. No replacement found.
+- `onesis` — points at SourceForge SVN hosting. The project page
+  redirects fine, but that doesn't confirm the `svn co` protocol
+  endpoint itself still works; not verified either way.
+- `torque` (adaptivecomputing.com) and `slurm` (schedmd.com) — both
+  hosts return 200, but that confirms the page loads, not that this
+  specific tarball is still served under this exact filename. Treat as
+  unverified, not confirmed dead.
+
+Everything else (`ftp.gnu.org`, SourceForge file downloads for
+`collectl`, `collectl-utils`, `modules`, `genders`, `gendersllnl`,
+`nsc.liu.se`) was already live and unchanged.
+
+## If a URL doesn't work
+
+Don't assume the recipe is broken by design — check this file first,
+since a fix may already exist upstream that hasn't been re-verified
+here. Otherwise:
+
+1. Find the tool's current upstream yourself.
 2. Place the tarball in the tool's `src/<tool>/` directory under the
    filename the Makefile's `TAR=` variable expects.
 3. Run `deploy --tool <toolname> --prefix DIR` (skips the download
    step once the tarball is already present) or invoke `make` directly
    in that directory.
-
-The recipes' build logic (configure flags, patches, install steps) is
-what's preserved and maintained here — the download URLs are kept
-as a historical record of where these tools lived in 2012, not as a
-live index.

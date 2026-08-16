@@ -2,8 +2,11 @@ include ../make.def
 
 VERSION=1.6
 SRC=clustershell-$(VERSION)
-TAR=$(SRC).tar.gz
-URL="https://github.com/downloads/cea-hpc/clustershell/$(TAR)"
+# clustershell was transferred from cea-hpc/clustershell to clustershell/clustershell;
+# GitHub's tag-archive basename is v$(VERSION).tar.gz, not $(SRC).tar.gz, but it
+# extracts to $(SRC)/ as expected (verified 2026-08-16).
+TAR=v$(VERSION).tar.gz
+URL="https://github.com/clustershell/clustershell/archive/refs/tags/$(TAR)"
 
 include ../make.workbench
 
