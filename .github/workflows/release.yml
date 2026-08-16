@@ -34,6 +34,14 @@ jobs:
             '/^Version:/{print v; next} 1' \
             debian/DEBIAN/control > /tmp/_ctrl && mv /tmp/_ctrl debian/DEBIAN/control
 
+      - name: Build source tarball
+        env:
+          CAP5DEVHOME: ${{ github.workspace }}
+        run: |
+          mkdir -p dist
+          ./build-cap5.sh official tgz
+          mv "cap-${RPM_VERSION}.tar.gz" "dist/"
+
       - name: Build RPM
         env:
           CAP5DEVHOME: ${{ github.workspace }}
@@ -99,6 +107,7 @@ jobs:
           files: |
             dist/*.rpm
             dist/*.deb
+            dist/*.tar.gz
             packaging/RPM-GPG-KEY-cap5
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}

@@ -9,7 +9,7 @@ License:      GPL
 Summary:      Cluster Administration Package (build/install framework)
 Group:        Productivity/Clustering/Computing
 URL:          https://github.com/cdmaestas/cap
-Source0:      https://github.com/cdmaestas/cap/archive/refs/tags/v%{version}.tar.gz
+Source0:      https://github.com/cdmaestas/cap/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Requires:     bash >= 4.0
 Requires:     coreutils
 Requires:     rsync
