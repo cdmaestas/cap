@@ -31,7 +31,11 @@ VERSION=$(grep "^Version:" "${CAP5DEVHOME}/cap.spec" | awk '{print $2}')
 git_version() {
     GITVERSION=$(git describe --always) || { echo "git describe failed" >&2; exit 1; }
     [[ -n "${GITVERSION}" ]] || { echo "git describe returned empty string" >&2; exit 1; }
-    GITMODIFIED=$(git status | grep -qE 'modified:|added:|deleted:' && echo "_M" || true)
+    if git status | grep -qE 'modified:|added:|deleted:'; then
+        GITMODIFIED="_M"
+    else
+        GITMODIFIED=""
+    fi
     RELEASE="${GITVERSION}${GITMODIFIED}"
 }
 
