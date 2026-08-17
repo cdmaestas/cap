@@ -95,10 +95,10 @@ export CAP5DEVHOME=$(pwd)
 
 Pushing a `v*.*.*` tag triggers the release workflow, which:
 1. Patches the version into `cap.spec` and `debian/DEBIAN/control` from the tag
-2. Builds RPM and DEB packages
-3. Signs the RPM with the project GPG key (stored as `secrets.GPG_PRIVATE_KEY`)
-4. Verifies the signature against `packaging/RPM-GPG-KEY-cap5`
-5. Publishes a GitHub Release with the signed packages and public key
+2. Builds a source tarball, RPM, and DEB package
+3. Signs the RPM (`rpmsign`) and DEB (`dpkg-sig`) with the project GPG key (stored as `secrets.GPG_PRIVATE_KEY` / `secrets.GPG_PASSPHRASE`)
+4. Verifies both signatures against `packaging/RPM-GPG-KEY-cap5`
+5. Publishes a GitHub Release with the signed packages, source tarball, and public key
 
 **To create a release:**
 ```sh
@@ -112,7 +112,13 @@ rpm --import packaging/RPM-GPG-KEY-cap5
 rpm --checksig cap-5.0.0-1.noarch.rpm
 ```
 
-**First-time setup:** add the GPG private key as a repository secret named `GPG_PRIVATE_KEY` in GitHub → Settings → Secrets and variables → Actions (same key used in Scale-GUInstall).
+**To verify a downloaded DEB** (requires the `dpkg-sig` package):
+```sh
+gpg --import packaging/RPM-GPG-KEY-cap5
+dpkg-sig --verify cap-5.0.0-1.deb
+```
+
+**First-time setup:** add the GPG private key as a repository secret named `GPG_PRIVATE_KEY`, and its passphrase as `GPG_PASSPHRASE`, in GitHub → Settings → Secrets and variables → Actions (same key used in Scale-GUInstall).
 
 ## Directory Layout
 

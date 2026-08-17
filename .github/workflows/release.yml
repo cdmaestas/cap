@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install build tools
-        run: sudo apt-get install -y rpm dpkg-dev shellcheck
+        run: sudo apt-get install -y rpm dpkg-dev dpkg-sig shellcheck
 
       - name: Set version from tag
         run: |
@@ -85,6 +85,14 @@ jobs:
             echo "Signed: $rpm"
           done
 
+      - name: Sign DEB
+        run: |
+          for deb in dist/*.deb; do
+            dpkg-sig --sign builder -k "$GPG_KEY_ID" \
+              -f "${GPG_PASSPHRASE_FILE}" -g "--pinentry-mode loopback" "$deb"
+            echo "Signed: $deb"
+          done
+
       - name: Clean up GPG passphrase file
         if: always()
         run: rm -f "${GPG_PASSPHRASE_FILE:-}"
@@ -94,6 +102,12 @@ jobs:
           rpm --import packaging/RPM-GPG-KEY-cap5
           for rpm in dist/*.rpm; do
             rpm --checksig "$rpm" && echo "OK: $rpm"
+          done
+
+      - name: Verify DEB signature
+        run: |
+          for deb in dist/*.deb; do
+            dpkg-sig --verify "$deb" && echo "OK: $deb"
           done
 
       - name: List artifacts
