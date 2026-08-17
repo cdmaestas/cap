@@ -138,7 +138,12 @@ elif [[ "${PKG}" == "deb" ]]; then
     else
         DIST_DEB="cap-${VERSION}-1_${RELEASE}.deb"
     fi
-    dpkg -b "${DEB_STAGING}" "${CAP5DEVHOME}/${DIST_DEB}"
+    # -Zgzip: debsigs 0.1.26's member-detection regex doesn't recognize the
+    # modern zstd-compressed control.tar.zst/data.tar.zst that dpkg-deb
+    # defaults to — it silently signs an incomplete concatenation, which
+    # then fails debsig-verify with a genuine signature mismatch. gzip is
+    # the newest compression debsigs' regex actually matches.
+    dpkg-deb --build -Zgzip "${DEB_STAGING}" "${CAP5DEVHOME}/${DIST_DEB}"
     echo "${PKGTYPE} cap5 ${PKG} located in ${CAP5DEVHOME}/${DIST_DEB}"
 elif [[ "${PKG}" == "tgz" ]]; then
     maketgz
