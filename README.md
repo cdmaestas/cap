@@ -112,14 +112,14 @@ rpm --import packaging/RPM-GPG-KEY-cap5
 rpm --checksig cap-5.0.0-1.noarch.rpm
 ```
 
-**To verify a downloaded DEB** (requires the `debsigs` and `debsig-verify` packages — `dpkg-sig` was dropped from Debian/Ubuntu and is no longer usable):
+**To verify a downloaded DEB** (requires the `debsig-verify` package — `dpkg-sig` was dropped from Debian/Ubuntu and is no longer usable):
 ```sh
 gpg --export CFBEEA09EFAB240DB5ADE97EA659912A9EBD149C > /tmp/debsig.gpg
 sudo install -D -m 644 /tmp/debsig.gpg \
   /usr/share/debsig/keyrings/CFBEEA09EFAB240DB5ADE97EA659912A9EBD149C/debsig.gpg
 sudo install -D -m 644 packaging/cap5-debsig-policy.pol \
   /etc/debsig/policies/CFBEEA09EFAB240DB5ADE97EA659912A9EBD149C/generic.pol
-debsigs --verify cap-5.0.0-1.deb
+debsig-verify cap-5.0.0-1.deb
 ```
 (The public key itself must already be imported into your GPG keyring — `gpg --import packaging/RPM-GPG-KEY-cap5` first if you haven't.)
 

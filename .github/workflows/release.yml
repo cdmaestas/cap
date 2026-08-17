@@ -130,8 +130,11 @@ jobs:
 
       - name: Verify DEB signature
         run: |
+          # debsigs --verify is unimplemented in the Ubuntu-packaged version
+          # ("Verify not yet implemented." at debsigs line 75) — call the
+          # verifier it's supposed to wrap directly instead.
           for deb in dist/*.deb; do
-            debsigs --verify "$deb" && echo "OK: $deb"
+            debsig-verify "$deb" && echo "OK: $deb"
           done
 
       - name: List artifacts
