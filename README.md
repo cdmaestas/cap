@@ -96,7 +96,7 @@ export CAP5DEVHOME=$(pwd)
 Pushing a `v*.*.*` tag triggers the release workflow, which:
 1. Patches the version into `cap.spec` and `debian/DEBIAN/control` from the tag
 2. Builds a source tarball, RPM, and DEB package
-3. Signs the RPM (`rpmsign`) and DEB (`dpkg-sig`) with the project GPG key (stored as `secrets.GPG_PRIVATE_KEY` / `secrets.GPG_PASSPHRASE`)
+3. Signs the RPM (`rpmsign`) and DEB (`debsigs`) with the project GPG key (stored as `secrets.GPG_PRIVATE_KEY` / `secrets.GPG_PASSPHRASE`)
 4. Verifies both signatures against `packaging/RPM-GPG-KEY-cap5`
 5. Publishes a GitHub Release with the signed packages, source tarball, and public key
 
@@ -112,13 +112,18 @@ rpm --import packaging/RPM-GPG-KEY-cap5
 rpm --checksig cap-5.0.0-1.noarch.rpm
 ```
 
-**To verify a downloaded DEB** (requires the `dpkg-sig` package):
+**To verify a downloaded DEB** (requires the `debsigs` and `debsig-verify` packages — `dpkg-sig` was dropped from Debian/Ubuntu and is no longer usable):
 ```sh
-gpg --import packaging/RPM-GPG-KEY-cap5
-dpkg-sig --verify cap-5.0.0-1.deb
+gpg --export CFBEEA09EFAB240DB5ADE97EA659912A9EBD149C > /tmp/debsig.gpg
+sudo install -D -m 644 /tmp/debsig.gpg \
+  /usr/share/debsig/keyrings/CFBEEA09EFAB240DB5ADE97EA659912A9EBD149C/debsig.gpg
+sudo install -D -m 644 packaging/cap5-debsig-policy.pol \
+  /etc/debsig/policies/CFBEEA09EFAB240DB5ADE97EA659912A9EBD149C/generic.pol
+debsigs --verify cap-5.0.0-1.deb
 ```
+(The public key itself must already be imported into your GPG keyring — `gpg --import packaging/RPM-GPG-KEY-cap5` first if you haven't.)
 
-**First-time setup:** add the GPG private key as a repository secret named `GPG_PRIVATE_KEY`, and its passphrase as `GPG_PASSPHRASE`, in GitHub → Settings → Secrets and variables → Actions (same key used in Scale-GUInstall).
+**First-time setup:** add the GPG private key as a repository secret named `GPG_PRIVATE_KEY`, and its passphrase as `GPG_PASSPHRASE`, in GitHub → Settings → Secrets and variables → Actions (same key used in Scale-GUInstall). If the signing key is ever rotated, `packaging/cap5-debsig-policy.pol`'s `id=` attributes must be updated to the new fingerprint — the release workflow asserts this rather than silently signing with a mismatched policy.
 
 ## Directory Layout
 

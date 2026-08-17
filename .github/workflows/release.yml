@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install build tools
-        run: sudo apt-get install -y rpm dpkg-dev dpkg-sig shellcheck
+        run: sudo apt-get install -y rpm dpkg-dev debsigs debsig-verify shellcheck
 
       - name: Set version from tag
         run: |
@@ -68,8 +68,11 @@ jobs:
           KEY_ID=$(gpg --list-secret-keys --keyid-format LONG 2>/dev/null \
             | grep "^sec" | head -1 | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$KEY_ID" >> "$GITHUB_ENV"
+          FINGERPRINT=$(gpg --with-colons --with-keygrip --list-secret-keys \
+            | awk -F: '/^sec/{f=1} f && /^fpr/{print $10; exit}')
+          echo "GPG_FINGERPRINT=$FINGERPRINT" >> "$GITHUB_ENV"
           mkdir -p ~/.gnupg
-          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          printf 'allow-loopback-pinentry\nallow-preset-passphrase\n' >> ~/.gnupg/gpg-agent.conf
           gpgconf --kill gpg-agent
           PASSPHRASE_FILE="${RUNNER_TEMP}/gpg-passphrase"
           install -m 600 /dev/null "${PASSPHRASE_FILE}"
@@ -77,6 +80,12 @@ jobs:
           echo "GPG_PASSPHRASE_FILE=${PASSPHRASE_FILE}" >> "$GITHUB_ENV"
           printf '%%_gpg_name %s\n%%__gpg /usr/bin/gpg\n%%__gpg_sign_cmd %%{__gpg} gpg --batch --no-verbose --no-armor --no-secmem-warning --pinentry-mode loopback --passphrase-file "%s" -u "%%{_gpg_name}" -sbo %%{__signature_filename} --digest-algo sha256 %%{__plaintext_filename}\n' \
             "$KEY_ID" "${PASSPHRASE_FILE}" > ~/.rpmmacros
+          # debsigs (used to sign the DEB) has no --passphrase-file of its own —
+          # it just calls plain gpg and relies on the agent already knowing the
+          # passphrase. Preset it into the running agent's cache instead.
+          KEYGRIP=$(gpg --with-colons --with-keygrip --list-secret-keys \
+            | awk -F: '/^sec/{f=1} f && /^grp/{print $10; exit}')
+          /usr/lib/gnupg/gpg-preset-passphrase --preset "$KEYGRIP" < "${PASSPHRASE_FILE}"
 
       - name: Sign RPM
         run: |
@@ -85,11 +94,26 @@ jobs:
             echo "Signed: $rpm"
           done
 
+      - name: Set up debsig-verify policy
+        run: |
+          POLICY_FPR=$(grep -oE 'id="[0-9A-F]{40}"' packaging/cap5-debsig-policy.pol \
+            | head -1 | tr -d '"' | cut -d= -f2)
+          if [[ "$POLICY_FPR" != "$GPG_FINGERPRINT" ]]; then
+            echo "packaging/cap5-debsig-policy.pol is signed by $POLICY_FPR" >&2
+            echo "but the currently imported key is $GPG_FINGERPRINT — update the" >&2
+            echo "policy file's id= attributes after any key rotation." >&2
+            exit 1
+          fi
+          gpg --export "$GPG_KEY_ID" > /tmp/debsig.gpg
+          sudo install -D -m 644 /tmp/debsig.gpg \
+            "/usr/share/debsig/keyrings/${GPG_FINGERPRINT}/debsig.gpg"
+          sudo install -D -m 644 packaging/cap5-debsig-policy.pol \
+            "/etc/debsig/policies/${GPG_FINGERPRINT}/generic.pol"
+
       - name: Sign DEB
         run: |
           for deb in dist/*.deb; do
-            dpkg-sig --sign builder -k "$GPG_KEY_ID" \
-              -f "${GPG_PASSPHRASE_FILE}" -g "--pinentry-mode loopback" "$deb"
+            debsigs --sign=origin --default-key="$GPG_KEY_ID" "$deb"
             echo "Signed: $deb"
           done
 
@@ -107,7 +131,7 @@ jobs:
       - name: Verify DEB signature
         run: |
           for deb in dist/*.deb; do
-            dpkg-sig --verify "$deb" && echo "OK: $deb"
+            debsigs --verify "$deb" && echo "OK: $deb"
           done
 
       - name: List artifacts
