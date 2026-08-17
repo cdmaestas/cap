@@ -58,8 +58,6 @@ jobs:
           mkdir -p dist
           ./build-cap5.sh official deb
           find . -maxdepth 1 -name "*.deb" -exec mv {} dist/ \;
-          echo "--- deb member names ---"
-          ar t dist/*.deb
 
       - name: Import GPG signing key
         env:
@@ -128,7 +126,6 @@ jobs:
           for deb in dist/*.deb; do
             debsigs --sign=origin --default-key="$GPG_KEY_ID" "$deb"
             echo "Signed: $deb"
-            debsigs --list "$deb"
           done
 
       - name: Clean up GPG passphrase file
