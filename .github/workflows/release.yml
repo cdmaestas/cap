@@ -58,6 +58,8 @@ jobs:
           mkdir -p dist
           ./build-cap5.sh official deb
           find . -maxdepth 1 -name "*.deb" -exec mv {} dist/ \;
+          echo "--- deb member names ---"
+          ar t dist/*.deb
 
       - name: Import GPG signing key
         env:
@@ -115,6 +117,7 @@ jobs:
           for deb in dist/*.deb; do
             debsigs --sign=origin --default-key="$GPG_KEY_ID" "$deb"
             echo "Signed: $deb"
+            debsigs --list "$deb"
           done
 
       - name: Clean up GPG passphrase file
@@ -134,7 +137,7 @@ jobs:
           # ("Verify not yet implemented." at debsigs line 75) — call the
           # verifier it's supposed to wrap directly instead.
           for deb in dist/*.deb; do
-            debsig-verify "$deb" && echo "OK: $deb"
+            debsig-verify -d "$deb" && echo "OK: $deb"
           done
 
       - name: List artifacts
