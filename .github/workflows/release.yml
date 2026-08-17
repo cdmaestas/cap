@@ -75,6 +75,17 @@ jobs:
           echo "GPG_FINGERPRINT=$FINGERPRINT" >> "$GITHUB_ENV"
           mkdir -p ~/.gnupg
           printf 'allow-loopback-pinentry\nallow-preset-passphrase\n' >> ~/.gnupg/gpg-agent.conf
+          # debsigs calls plain `gpg --openpgp --detach-sign` with no
+          # --digest-algo, and gpg's default (at least on this GnuPG version)
+          # resolves to SHA1 even though the key's own preferences rank it
+          # last — confirmed by reproducing it locally and inspecting the
+          # resulting signature packet with `gpg --list-packets`. Ubuntu's
+          # gpg then refuses to *verify* SHA1 signatures at all ("Note:
+          # signatures using the SHA1 algorithm are rejected"). debsigs has
+          # no CLI flag that actually reaches its signing gpg call (--gpgopts
+          # is parsed but never used in cmd_sign, confirmed by reading the
+          # source), so force it globally via gpg.conf instead.
+          echo 'digest-algo SHA256' >> ~/.gnupg/gpg.conf
           gpgconf --kill gpg-agent
           PASSPHRASE_FILE="${RUNNER_TEMP}/gpg-passphrase"
           install -m 600 /dev/null "${PASSPHRASE_FILE}"
@@ -137,7 +148,7 @@ jobs:
           # ("Verify not yet implemented." at debsigs line 75) — call the
           # verifier it's supposed to wrap directly instead.
           for deb in dist/*.deb; do
-            debsig-verify -d "$deb" && echo "OK: $deb"
+            debsig-verify "$deb" && echo "OK: $deb"
           done
 
       - name: List artifacts
